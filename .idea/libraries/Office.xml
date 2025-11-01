@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Office">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Office.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
