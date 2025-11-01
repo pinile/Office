@@ -9,7 +9,8 @@ public class OfficeDataBaseTester {
 
     public static void main(String[] args) throws SQLException {
         testConnection();
-        searchAnn();
+//        searchAnn();
+        checkAllEmployeesNames();
     }
 
     private static void testConnection() throws SQLException {
@@ -26,6 +27,7 @@ public class OfficeDataBaseTester {
     }
 
     /**
+     * 1.
      * 1. Найдите ID сотрудника с именем Ann.
      * 2. Если такой сотрудник только один, то установите его департамент в HR.
      */
@@ -44,11 +46,11 @@ public class OfficeDataBaseTester {
             employees.forEach(e -> System.out.println(" - id: " + e.getEmployeeId()));
         }
 
-        // 1.
+        // 1. Найдите ID сотрудника с именем Ann.
         Employee ann = employees.getFirst();
         System.out.printf("Найден сотрудник %s с id - %d\n", name, ann.getEmployeeId());
 
-        // 2.
+        // 2. Если такой сотрудник только один, то установите его департамент в HR.
         Department hr = findDepartmentByName("HR");
         if (hr == null) {
             System.out.println("Департмент не найден");
@@ -67,11 +69,39 @@ public class OfficeDataBaseTester {
                 : "Не удалось обновить департамент для сотрудника.");
     }
 
-/**
- * 2. Проверьте имена всех сотрудников.
- * Если чьё-то имя написано с маленькой буквы, исправьте её на большую.
- * Выведите на экран количество исправленных имён.*/
+    /**
+     * 2.
+     * 1. Проверьте имена всех сотрудников.
+     * 2. Если чьё-то имя написано с маленькой буквы, исправьте её на большую.
+     * 3. Выведите на экран количество исправленных имён.
+     */
+    private static void checkAllEmployeesNames() throws SQLException {
+        List<Employee> employees = findAllEmployees();
+        int count = 0;
 
+        for (Employee employee : employees) {
+            String name = employee.getName();
+            if (name != null && !name.isEmpty() && Character.isLowerCase(name.charAt(0))) {
+                System.out.println("Сотрудник, у которого имя написано с маленькой буквы: " + name);
+                String correctedName = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+
+                employee.setName(correctedName);
+
+                String query = """
+                        UPDATE employee
+                        SET name = ?
+                        WHERE id = ?
+                        """;
+                int rowsUpdated = DatabaseHelper.executeUpdate(query, correctedName, employee.getEmployeeId());
+                if (rowsUpdated > 0) {
+                    count++;
+                }
+            }
+        }
+        System.out.println("Количество исправленных имён: " + count);
+
+//        employees.forEach(System.out::println);
+    }
 
 
     private static List<Employee> findEmployeeByName(String name) throws SQLException {
@@ -95,6 +125,17 @@ public class OfficeDataBaseTester {
                 new Employee(rs.getInt("id"),
                         rs.getString("name"),
                         rs.getInt("departmentId")), id);
+
+    }
+
+    private static List<Employee> findAllEmployees() throws SQLException {
+        String query = """
+                SELECT id, name, departmentid
+                FROM employee""";
+        return DatabaseHelper.executeQuery(query, rs ->
+                new Employee(rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("departmentid")));
 
     }
 
