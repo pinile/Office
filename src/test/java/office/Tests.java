@@ -1,6 +1,6 @@
-import java.db.DatabaseHelper;
-import java.office.Department;
-import java.office.Employee;
+package office;
+
+import db.DatabaseHelper;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -9,26 +9,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-public class OfficeDataBaseTester {
+public class Tests {
 
     private static final DatabaseHelper.ResultSetMapper<Employee> EMPLOYEE_MAPPER = rs ->
             new Employee(rs.getInt("id"), rs.getString("name"), rs.getInt("departmentid"));
     private static final DatabaseHelper.ResultSetMapper<Department> DEPARTMENT_MAPPER = rs ->
             new Department(rs.getInt("id"), rs.getString("name"));
-
-
-    /*class Tests {
-        testConnection();
-
-        // 1
-        searchAnn();
-
-        // 2
-        checkAllEmployeesNames();
-
-        // 3
-        countAllEmployeesInItDepartment();
-    }*/
 
     @Test
     void testConnection() throws SQLException {
