@@ -17,7 +17,7 @@ public class Tests {
             new Department(rs.getInt("id"), rs.getString("name"));
 
     @Test
-    void testConnection() throws SQLException {
+    void testConnection() {
         try (Connection connection = DatabaseHelper.getConnection()) {
             System.out.println("Connected to database");
 
@@ -32,7 +32,6 @@ public class Tests {
 
     /**
      * 1.
-     *
      * 1. Найдите ID сотрудника с именем Ann.
      * 2. Если такой сотрудник только один, то установите его департамент в HR.
      */
@@ -77,7 +76,6 @@ public class Tests {
 
     /**
      * 2.
-     *
      * 1. Проверьте имена всех сотрудников.
      * 2. Если чьё-то имя написано с маленькой буквы, исправьте её на большую.
      * 3. Выведите на экран количество исправленных имён.
@@ -113,7 +111,6 @@ public class Tests {
 
     /**
      * 3.
-     *
      * 1. Выведите на экран количество сотрудников в IT-отделе
      */
     @Test

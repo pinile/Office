@@ -64,7 +64,7 @@ public class DatabaseHelper {
     }
 
     // Установка параметров в PreparedStatement
-    private static void setParams(PreparedStatement ps, Object... params) throws SQLException {
+    private static void setParams(PreparedStatement ps, Object... params) {
         IntStream.range(0, params.length).forEach(i -> {
             try {
                 ps.setObject(i + 1, params[i]);
