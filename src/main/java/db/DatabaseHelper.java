@@ -1,4 +1,4 @@
-package office;
+package java.db;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -73,7 +73,6 @@ public class DatabaseHelper {
             }
         });
     }
-
 
     // Интерфейс для маппинга ResultSet в объекты
     public interface ResultSetMapper<T> {

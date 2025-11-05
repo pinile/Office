@@ -1,14 +1,25 @@
-package office;
+import java.db.DatabaseHelper;
+import java.office.Department;
+import java.office.Employee;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 public class OfficeDataBaseTester {
 
-    public static void main(String[] args) throws SQLException {
-//        testConnection();
+    private static final DatabaseHelper.ResultSetMapper<Employee> EMPLOYEE_MAPPER = rs ->
+            new Employee(rs.getInt("id"), rs.getString("name"), rs.getInt("departmentid"));
+    private static final DatabaseHelper.ResultSetMapper<Department> DEPARTMENT_MAPPER = rs ->
+            new Department(rs.getInt("id"), rs.getString("name"));
+
+
+    /*class Tests {
+        testConnection();
+
         // 1
         searchAnn();
 
@@ -17,9 +28,10 @@ public class OfficeDataBaseTester {
 
         // 3
         countAllEmployeesInItDepartment();
-    }
+    }*/
 
-    private static void testConnection() throws SQLException {
+    @Test
+    void testConnection() throws SQLException {
         try (Connection connection = DatabaseHelper.getConnection()) {
             System.out.println("Connected to database");
 
@@ -34,10 +46,12 @@ public class OfficeDataBaseTester {
 
     /**
      * 1.
+     *
      * 1. Найдите ID сотрудника с именем Ann.
      * 2. Если такой сотрудник только один, то установите его департамент в HR.
      */
-    private static void searchAnn() throws SQLException {
+    @Test
+    void searchAnn() throws SQLException {
         String name = "Ann";
 
         List<Employee> employees = findEmployeeByName(name);
@@ -77,11 +91,13 @@ public class OfficeDataBaseTester {
 
     /**
      * 2.
+     *
      * 1. Проверьте имена всех сотрудников.
      * 2. Если чьё-то имя написано с маленькой буквы, исправьте её на большую.
      * 3. Выведите на экран количество исправленных имён.
      */
-    private static void checkAllEmployeesNames() throws SQLException {
+    @Test
+    void checkAllEmployeesNames() throws SQLException {
         List<Employee> employees = findAllEmployees();
         int count = 0;
 
@@ -111,22 +127,19 @@ public class OfficeDataBaseTester {
 
     /**
      * 3.
+     *
      * 1. Выведите на экран количество сотрудников в IT-отделе
      */
-    private static void countAllEmployeesInItDepartment() throws SQLException {
+    @Test
+    void countAllEmployeesInItDepartment() throws SQLException {
         List<Employee> employees = findEmployeesInDepartment("IT");
-        int count = 0;
 
         if (employees.isEmpty()) {
             System.out.println("Департамент не найден.");
+            return;
         }
 
-        for (Employee employee : employees) {
-            if (employee != null) {
-                count++;
-            }
-        }
-
+        long count = employees.stream().filter(Objects::nonNull).count();
         System.out.println("Сотрудников в IT отделе: " + count);
     }
 
@@ -136,10 +149,7 @@ public class OfficeDataBaseTester {
                 SELECT id, name, departmentid
                 FROM employee
                 WHERE name = ?""";
-        return DatabaseHelper.executeQuery(query, rs ->
-                new Employee(rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getInt("departmentid")), name);
+        return DatabaseHelper.executeQuery(query, EMPLOYEE_MAPPER, name);
 
     }
 
@@ -148,10 +158,7 @@ public class OfficeDataBaseTester {
                 SELECT id, name, departmentid
                 FROM employee
                 WHERE id = ?""";
-        return DatabaseHelper.executeQuerySingle(query, rs ->
-                new Employee(rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getInt("departmentId")), id);
+        return DatabaseHelper.executeQuerySingle(query, EMPLOYEE_MAPPER, id);
 
     }
 
@@ -159,10 +166,7 @@ public class OfficeDataBaseTester {
         String query = """
                 SELECT id, name, departmentid
                 FROM employee""";
-        return DatabaseHelper.executeQuery(query, rs ->
-                new Employee(rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getInt("departmentid")));
+        return DatabaseHelper.executeQuery(query, EMPLOYEE_MAPPER);
 
     }
 
@@ -171,9 +175,7 @@ public class OfficeDataBaseTester {
                 SELECT id, name
                 FROM department
                 WHERE id = ?""";
-        return DatabaseHelper.executeQuerySingle(query, rs ->
-                new Department(rs.getInt("id"),
-                        rs.getString("name")), id);
+        return DatabaseHelper.executeQuerySingle(query, DEPARTMENT_MAPPER, id);
 
     }
 
@@ -182,9 +184,7 @@ public class OfficeDataBaseTester {
                 SELECT id, name
                 FROM department
                 WHERE name = ?""";
-        return DatabaseHelper.executeQuerySingle(query, rs ->
-                new Department(rs.getInt("id"),
-                        rs.getString("name")), name);
+        return DatabaseHelper.executeQuerySingle(query, DEPARTMENT_MAPPER, name);
 
     }
 
@@ -193,12 +193,7 @@ public class OfficeDataBaseTester {
                 SELECT id, name, departmentid
                 FROM employee
                 WHERE departmentId in (SELECT id FROM department WHERE name = ?)""";
-        return DatabaseHelper.executeQuery(query, rs ->
-                new Employee(rs.getInt("id"),
-                        rs.getString("name"),
-                        rs.getInt("departmentid")), department);
+        return DatabaseHelper.executeQuery(query, EMPLOYEE_MAPPER, department);
 
     }
-
-
 }
