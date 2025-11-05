@@ -8,9 +8,15 @@ import java.util.List;
 public class OfficeDataBaseTester {
 
     public static void main(String[] args) throws SQLException {
-        testConnection();
-//        searchAnn();
+//        testConnection();
+        // 1
+        searchAnn();
+
+        // 2
         checkAllEmployeesNames();
+
+        // 3
+        countAllEmployeesInItDepartment();
     }
 
     private static void testConnection() throws SQLException {
@@ -103,6 +109,27 @@ public class OfficeDataBaseTester {
 //        employees.forEach(System.out::println);
     }
 
+    /**
+     * 3.
+     * 1. Выведите на экран количество сотрудников в IT-отделе
+     */
+    private static void countAllEmployeesInItDepartment() throws SQLException {
+        List<Employee> employees = findEmployeesInDepartment("IT");
+        int count = 0;
+
+        if (employees.isEmpty()) {
+            System.out.println("Департамент не найден.");
+        }
+
+        for (Employee employee : employees) {
+            if (employee != null) {
+                count++;
+            }
+        }
+
+        System.out.println("Сотрудников в IT отделе: " + count);
+    }
+
 
     private static List<Employee> findEmployeeByName(String name) throws SQLException {
         String query = """
@@ -158,6 +185,18 @@ public class OfficeDataBaseTester {
         return DatabaseHelper.executeQuerySingle(query, rs ->
                 new Department(rs.getInt("id"),
                         rs.getString("name")), name);
+
+    }
+
+    private static List<Employee> findEmployeesInDepartment(String department) throws SQLException {
+        String query = """
+                SELECT id, name, departmentid
+                FROM employee
+                WHERE departmentId in (SELECT id FROM department WHERE name = ?)""";
+        return DatabaseHelper.executeQuery(query, rs ->
+                new Employee(rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getInt("departmentid")), department);
 
     }
 
