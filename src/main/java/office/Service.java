@@ -1,13 +1,9 @@
 package office;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class Service {
-    
+
     final static String URL = "jdbc:h2:tcp://localhost:9092/./Office";
 
     public static void createDB() {
@@ -47,9 +43,21 @@ public class Service {
 
     public static void removeDepartment(Department d) {
         try (Connection con = DriverManager.getConnection(URL)) {
-            PreparedStatement stm = con.prepareStatement("DELETE FROM Department WHERE ID=?");
-            stm.setInt(1, d.departmentID);
-            stm.executeUpdate();
+            con.setAutoCommit(false);
+
+            try (PreparedStatement deleteDepartment = con.prepareStatement("DELETE FROM Department WHERE ID=?");
+                 PreparedStatement deleteEmployees = con.prepareStatement("DELETE FROM Employee WHERE DepartmentID=?")) {
+                deleteEmployees.setInt(1, d.departmentID);
+                deleteEmployees.executeUpdate();
+
+                deleteDepartment.setInt(1, d.departmentID);
+                deleteDepartment.executeUpdate();
+
+                con.commit();
+            } catch (Exception e) {
+                con.rollback();
+                throw e;
+            }
         } catch (Exception e) {
             System.out.println(e);
         }
