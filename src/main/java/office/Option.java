@@ -1,6 +1,5 @@
 package office;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -17,7 +16,7 @@ public enum Option {
             String name=sc.next();
             System.out.println("Введите id отдела:");
             int depid=sc.nextInt();
-            Service.addEmployee(new Employee(id,name,depid));
+            service.addEmployee(new Employee(id,name,depid));
         }
     },
     DeleteEmployee {
@@ -28,7 +27,7 @@ public enum Option {
         void action() {
             System.out.println("Введите его id:");
             int id=sc.nextInt();
-            Service.removeEmployee(new Employee(id,"",0));
+            service.removeEmployee(new Employee(id,"",0));
         }
     },
     AddDepartment {
@@ -41,7 +40,7 @@ public enum Option {
             int id=sc.nextInt();
             System.out.println("Введите его название:");
             String name=sc.next();
-            Service.addDepartment(new Department(id,name));
+            service.addDepartment(new Department(id,name));
         }
     },
     DeleteDepartment {
@@ -52,7 +51,7 @@ public enum Option {
         void action() {
             System.out.println("Введите его id:");
             int id=sc.nextInt();
-            Service.removeDepartment(new Department(id,""));
+            service.removeDepartment(new Department(id,""));
         }
     },
     CLEAR_DB {
@@ -61,7 +60,7 @@ public enum Option {
         }
 
         void action() {
-            Service.createDB();
+            service.createDB();
         }
 
     },
@@ -125,4 +124,5 @@ public enum Option {
     Scanner sc = new Scanner(System.in);
     abstract String getText();
     abstract void action();
+    Service service;
 }
